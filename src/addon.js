@@ -13,14 +13,14 @@ const builder = new addonBuilder({
   catalogs: [
     {
       type: "movie",
-      id: "top",
+      id: "plab",
       name: "lab",
     },
   ],
-  resources: ["catalog", "stream"],
-  types: ["channel"],
+  resources: ["catalog", "meta", "stream"],
+  types: ["movie"],
   name: "lab-list",
-  description: "",
+  description: "heheheh",
 });
 
 const cookies =
@@ -49,14 +49,15 @@ const getBody = (page, args) => request()(page, args);
 builder.defineCatalogHandler(async ({ type, id, extra }) => {
   console.log("request for catalogs: " + type + " " + id);
   // Docs: https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/api/requests/defineCatalogHandler.md
+  if (type === "movie" && id === "plab") {
+    const page = await request()(
+      "tracker.php",
+      "prev_my=0&prev_new=0&prev_oop=0&f%5B%5D=1715&o=1&s=2&tm=-1&pn=&nm="
+    );
 
-  const args =
-    "prev_my=0&prev_new=0&prev_oop=0&f%5B%5D=1715&o=1&s=2&tm=-1&pn=&nm=";
+    console.log(page.body, "fetched");
 
-  const catalog = cache.get(args);
-
-  if (!catalog) {
-    extractTable(
+    const catalog = extractTable(
       [
         ["Форум", "category"],
         ["Тема", "name"],
@@ -64,9 +65,41 @@ builder.defineCatalogHandler(async ({ type, id, extra }) => {
         ["Размер", "size"],
         ["Добавлен", "date_added"],
       ],
-      getBody("tracker.php", args)
-    ).then((catalog) => cache.set(args, catalog, 300));
+      page.body
+    );
+
+    console.log("CATALOG", catalog);
+
+    return {
+      metas: catalog.map((item) => ({
+        id: item.id,
+        name: item.attr.name,
+        type: "movie",
+        poster: "https://i.ytimg.com/vi/9bZkp7q19f0/hqdefault.jpg",
+      })),
+    };
   }
+
+  const args =
+    "prev_my=0&prev_new=0&prev_oop=0&f%5B%5D=1715&o=1&s=2&tm=-1&pn=&nm=";
+
+  // const catalog = cache.get(args);
+
+  console.log();
+
+  const catalog = await extractTable(
+    [
+      ["Форум", "category"],
+      ["Тема", "name"],
+      ["Автор", "author"],
+      ["Размер", "size"],
+      ["Добавлен", "date_added"],
+    ],
+    getBody("tracker.php", args)
+  );
+
+  console.log(catalog);
+  //.then((catalog) => cache.set(args, catalog, 300));
 
   return Promise.resolve({
     metas: catalog.map((item) => ({
@@ -77,20 +110,24 @@ builder.defineCatalogHandler(async ({ type, id, extra }) => {
   });
 });
 
-// builder.defineMetaHandler(({ type, id }) => {
-//   return Promise.resolve({ meta: { id } });
-// });
+builder.defineMetaHandler(({ type, id }) => {
+  return Promise.resolve({ meta: { id } });
+});
 
 builder.defineStreamHandler(async ({ type, id }) => {
   console.log("request for streams: " + type + " " + id);
   // Docs: https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/api/requests/defineStreamHandler.md
   // return no streams
 
-  const { name, infoHash } = request("post")("dl.php?t=3006295").then((res) =>
-    parseTorrent(res.body)
-  );
+  const torrentId = id.replace("pl", "");
 
-  return Promise.resolve({ streams: [{ infoHash, name }] });
+  const torrentFile = await request("post")(`dl.php?t=${torrentId}`);
+
+  const torrentInfo = await parseTorrent(torrentFile.body);
+
+  console.log(torrentInfo)
+
+  return Promise.resolve({ streams: [{ infoHash: torrentInfo.infoHash, name: "" }] });
 });
 
 export default builder.getInterface();

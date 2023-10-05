@@ -1,8 +1,7 @@
-import cheerio from "cheerio";
+import cheerio from "npm:cheerio";
 
-
-export async function extractTable(headerPairs, html) {
-  const $ = cheerio.load(await html);
+export function extractTable(headerPairs, html) {
+  const $ = cheerio.load(html);
   const tableData = [];
 
   const tableRows = $("#tor-tbl tbody tr");

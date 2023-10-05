@@ -1,5 +1,6 @@
 {
   "tasks": {
-    "start": "deno run -A --watch=src/ server.js"
+    "start": "deno run -A --watch=src/ server.js",
+    "test": "deno run -A --watch=src/ src/tests.js"
   }
 }
