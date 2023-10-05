@@ -1,7 +1,7 @@
 
-import { serveHTTP, publishToCentral } from "stremio-addon-sdk";
-import addonInterface from "./addon";
-serveHTTP(addonInterface, { port: process.env.PORT as any || 57647 });
+import { serveHTTP, publishToCentral } from "npm:stremio-addon-sdk";
+import addonInterface from "./src/addon.js";
+serveHTTP(addonInterface, { port: Deno.env.get("PORT") || 57647 });
 
 // when you've deployed your addon, un-comment this line
 // publishToCentral("https://my-addon.awesome/manifest.json")

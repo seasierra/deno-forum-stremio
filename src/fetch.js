@@ -1,4 +1,4 @@
-import needle from "needle";
+import needle from "npm:needle";
 
 const headers = {
   accept:

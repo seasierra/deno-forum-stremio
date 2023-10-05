@@ -1,5 +1,5 @@
 import cheerio from "cheerio";
-import { mock } from "./mock";
+
 
 export async function extractTable(headerPairs, html) {
   const $ = cheerio.load(await html);
@@ -8,10 +8,10 @@ export async function extractTable(headerPairs, html) {
   const tableRows = $("#tor-tbl tbody tr");
   const tableHd = $("#tor-tbl thead tr")
     .children()
-    .map((idx, el) => $(el).text().trim())
+    .map((_, el) => $(el).text().trim())
     .toArray();
 
-  tableRows.each((index, row) => {
+  tableRows.each((_index, row) => {
     const tableCells = $(row).find("td");
 
     const [threadUrl, threadId] = $(tableCells)
@@ -45,14 +45,14 @@ export async function extractTable(headerPairs, html) {
   return tableData;
 }
 
-export const extractPostImages = (html, id) => {
+export const extractPostImages = (html, _id) => {
   const $ = cheerio.load(html);
 
   const topic = $("#topic_main var.postImg");
 
   const links = [];
 
-  topic.each((i, img) => {
+  topic.each((_i, img) => {
     links.push($(img).attr("title"));
   });
 
