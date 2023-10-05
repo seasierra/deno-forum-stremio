@@ -1,0 +1,6 @@
+{
+  "name": "foorum-deno",
+  "scripts": {
+    "start": "deno task start"
+  }
+}
