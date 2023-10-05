@@ -44,7 +44,7 @@ export function extractTable(headerPairs, html) {
   return tableData;
 }
 
-export const extractPostImages = (html, _id) => {
+export const extractPostImages = (html) => {
   const $ = cheerio.load(html);
 
   const topic = $("#topic_main var.postImg");

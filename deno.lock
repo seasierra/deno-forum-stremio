@@ -863,5 +863,7 @@
       }
     }
   },
-  "remote": {}
+  "remote": {
+    "https://deno.land/x/compose@1.0.0/index.js": "d08433edf086b41849a84b04ee733eb5830ade9bed74053fbd847017f3cf8a4a"
+  }
 }
